@@ -1,0 +1,2050 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BienestarNOM35 - Portal de Bienestar Laboral</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore-compat.js"></script>
+  
+  <style>
+    /* Tailwind configurations */
+    :root {
+      --background: 210 40% 98%;
+      --foreground: 222.2 84% 4.9%;
+      --card: 0 0% 100%;
+      --card-foreground: 222.2 84% 4.9%;
+      --popover: 0 0% 100%;
+      --popover-foreground: 222.2 84% 4.9%;
+      --primary: 210 100% 50%;
+      --primary-foreground: 210 40% 98%;
+      --secondary: 210 40% 96.1%;
+      --secondary-foreground: 222.2 47.4% 11.2%;
+      --muted: 210 40% 96.1%;
+      --muted-foreground: 215.4 16.3% 46.9%;
+      --accent: 210 40% 96.1%;
+      --accent-foreground: 222.2 47.4% 11.2%;
+      --destructive: 0 84.2% 60.2%;
+      --destructive-foreground: 210 40% 98%;
+      --border: 214.3 31.8% 91.4%;
+      --input: 214.3 31.8% 91.4%;
+      --ring: 222.2 84% 4.9%;
+      --radius: 1rem;
+    }
+
+    .dark {
+      --background: 222.2 84% 4.9%;
+      --foreground: 210 40% 98%;
+      --card: 222.2 84% 4.9%;
+      --card-foreground: 210 40% 98%;
+      --popover: 222.2 84% 4.9%;
+      --popover-foreground: 210 40% 98%;
+      --primary: 210 100% 50%;
+      --primary-foreground: 222.2 47.4% 11.2%;
+      --secondary: 217.2 32.6% 17.5%;
+      --secondary-foreground: 210 40% 98%;
+      --muted: 217.2 32.6% 17.5%;
+      --muted-foreground: 215 20.2% 65.1%;
+      --accent: 217.2 32.6% 17.5%;
+      --accent-foreground: 210 40% 98%;
+      --destructive: 0 62.8% 30.6%;
+      --destructive-foreground: 210 40% 98%;
+      --border: 217.2 32.6% 17.5%;
+      --input: 217.2 32.6% 17.5%;
+      --ring: 212.7 26.8% 83.9%;
+    }
+
+    * {
+      border-color: hsl(var(--border));
+    }
+
+    body {
+      background-color: hsl(var(--background));
+      color: hsl(var(--foreground));
+      min-height: 100vh;
+      font-feature-settings: "ss01", "ss02", "cv01", "cv02", "cv03";
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    .glass {
+      background-color: rgba(255, 255, 255, 0.5);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+
+    .dark .glass {
+      background-color: rgba(0, 0, 0, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .glass-card {
+      @apply glass rounded-2xl transition-all duration-300 hover:shadow-xl;
+    }
+
+    .section-fade-in {
+      opacity: 0;
+      transform: translateY(10px);
+      animation: fadeIn 0.6s ease-out forwards;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .animate-pulse-gentle {
+      animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% {
+        opacity: 0.5;
+      }
+      50% {
+        opacity: 0.8;
+      }
+    }
+
+    .animate-bounce {
+      animation: bounce 1s infinite;
+    }
+
+    @keyframes bounce {
+      0%, 100% {
+        transform: translateY(-25%);
+        animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+      }
+      50% {
+        transform: translateY(0);
+        animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+      }
+    }
+
+    .animate-fade-in {
+      animation: fadeIn 0.6s ease-out forwards;
+    }
+
+    .animate-spin {
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      from {
+        transform: rotate(0deg);
+      }
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    #toast-container {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 1000;
+    }
+
+    .toast {
+      margin-top: 10px;
+      padding: 16px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      transform: translateX(120%);
+      animation: slideIn 0.3s forwards, fadeOut 0.3s 4.7s forwards;
+      max-width: 350px;
+    }
+
+    .toast-success {
+      background-color: hsl(var(--card));
+      color: hsl(var(--card-foreground));
+      border-left: 4px solid #10b981;
+    }
+
+    .toast-error {
+      background-color: hsl(var(--card));
+      color: hsl(var(--card-foreground));
+      border-left: 4px solid #ef4444;
+    }
+
+    @keyframes slideIn {
+      from { transform: translateX(120%); }
+      to { transform: translateX(0); }
+    }
+
+    @keyframes fadeOut {
+      from { opacity: 1; transform: translateX(0); }
+      to { opacity: 0; transform: translateX(120%); }
+    }
+  </style>
+  
+  <script>
+    // Tailwind config
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            primary: 'hsl(var(--primary))',
+            secondary: 'hsl(var(--secondary))',
+            background: 'hsl(var(--background))',
+            foreground: 'hsl(var(--foreground))',
+            muted: 'hsl(var(--muted))',
+            'muted-foreground': 'hsl(var(--muted-foreground))',
+            border: 'hsl(var(--border))',
+            input: 'hsl(var(--input))',
+          },
+        }
+      }
+    }
+  </script>
+</head>
+<body class="antialiased">
+  <div id="app" class="max-w-[1920px] w-full mx-auto">
+    <!-- Navbar -->
+    <nav id="navbar" class="fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-transparent">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between h-16 items-center">
+          <div class="flex items-center">
+            <span class="text-primary font-bold text-xl tracking-tight">BienestarNOM35</span>
+          </div>
+          
+          <!-- Desktop menu -->
+          <div class="hidden md:flex items-center space-x-8">
+            <button onclick="scrollToSection('home')" class="text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors">
+              Inicio
+            </button>
+            <button onclick="scrollToSection('stress-test')" class="text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors">
+              Evaluación
+            </button>
+            <button onclick="scrollToSection('mindfulness')" class="text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors">
+              Mindfulness
+            </button>
+            <button onclick="scrollToSection('sleep')" class="text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors">
+              Sueño
+            </button>
+            <button onclick="scrollToSection('community')" class="text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors">
+              Comunidad
+            </button>
+            
+            <button id="logout-button" class="text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors hidden">
+              Cerrar Sesión
+            </button>
+            
+            <button 
+              id="theme-toggle"
+              class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors focus:outline-none"
+              aria-label="Toggle theme"
+            >
+              <i data-lucide="moon" class="h-5 w-5 theme-toggle-icon"></i>
+              <i data-lucide="sun" class="h-5 w-5 theme-toggle-icon hidden"></i>
+            </button>
+          </div>
+          
+          <!-- Mobile menu button -->
+          <div class="md:hidden flex items-center">
+            <button 
+              id="mobile-theme-toggle"
+              class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-800 mr-2 transition-colors focus:outline-none"
+              aria-label="Toggle theme"
+            >
+              <i data-lucide="moon" class="h-5 w-5 mobile-theme-toggle-icon"></i>
+              <i data-lucide="sun" class="h-5 w-5 mobile-theme-toggle-icon hidden"></i>
+            </button>
+            
+            <button
+              id="mobile-menu-button"
+              class="p-2 rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors focus:outline-none"
+              aria-label="Open menu"
+            >
+              <i data-lucide="menu" class="h-6 w-6" id="menu-icon"></i>
+              <i data-lucide="x" class="h-6 w-6 hidden" id="close-icon"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Mobile menu -->
+      <div id="mobile-menu" class="md:hidden glass shadow-lg animate-fade-in hidden">
+        <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+          <button
+            onclick="scrollToSection('home'); closeMobileMenu();"
+            class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary hover:bg-gray-200/50 dark:hover:bg-gray-800/50 w-full text-left transition-colors"
+          >
+            Inicio
+          </button>
+          <button
+            onclick="scrollToSection('stress-test'); closeMobileMenu();"
+            class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary hover:bg-gray-200/50 dark:hover:bg-gray-800/50 w-full text-left transition-colors"
+          >
+            Evaluación
+          </button>
+          <button
+            onclick="scrollToSection('mindfulness'); closeMobileMenu();"
+            class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary hover:bg-gray-200/50 dark:hover:bg-gray-800/50 w-full text-left transition-colors"
+          >
+            Mindfulness
+          </button>
+          <button
+            onclick="scrollToSection('sleep'); closeMobileMenu();"
+            class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary hover:bg-gray-200/50 dark:hover:bg-gray-800/50 w-full text-left transition-colors"
+          >
+            Sueño
+          </button>
+          <button
+            onclick="scrollToSection('community'); closeMobileMenu();"
+            class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary hover:bg-gray-200/50 dark:hover:bg-gray-800/50 w-full text-left transition-colors"
+          >
+            Comunidad
+          </button>
+          
+          <button
+            id="mobile-logout-button"
+            onclick="handleLogout(); closeMobileMenu();"
+            class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary hover:bg-gray-200/50 dark:hover:bg-gray-800/50 w-full text-left transition-colors hidden"
+          >
+            Cerrar Sesión
+          </button>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <div id="home" class="min-h-screen flex flex-col justify-center items-center px-4 md:px-8 pt-16 pb-8 relative">
+      <div id="hero-content" class="max-w-4xl mx-auto text-center transition-opacity duration-1000 opacity-0">
+        <div class="inline-block glass-card px-4 py-1 mb-6">
+          <span class="text-xs font-medium uppercase tracking-wider text-primary">
+            NOM-035-STPS-2018
+          </span>
+        </div>
+        
+        <h1 class="text-4xl md:text-6xl font-bold mb-6 leading-tight">
+          Mejora tu bienestar laboral
+          <span class="block text-primary">reduce tu estrés.</span>
+        </h1>
+        
+        <p class="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
+          Herramientas diseñadas específicamente para ayudarte a controlar el estrés laboral y promover un ambiente de trabajo saludable conforme a la NOM-035.
+        </p>
+        
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+          <button
+            onclick="scrollToSection('stress-test')"
+            class="bg-primary text-white hover:bg-primary/90 px-8 py-3 rounded-full font-medium shadow-md hover:shadow-lg transition-all"
+          >
+            Comenzar Evaluación
+          </button>
+          
+          <button
+            onclick="scrollToSection('mindfulness')"
+            class="bg-secondary text-primary hover:bg-secondary/80 px-8 py-3 rounded-full font-medium shadow-md hover:shadow-lg transition-all"
+          >
+            Ejercicios de Respiración
+          </button>
+        </div>
+      </div>
+      
+      <div class="absolute bottom-8 animate-bounce">
+        <button
+          onclick="scrollToSection('auth')"
+          aria-label="Scroll down"
+          class="text-primary hover:text-primary/80 transition-colors"
+        >
+          <i data-lucide="arrow-down" class="h-7 w-7"></i>
+        </button>
+      </div>
+      
+      <!-- Background circles -->
+      <div class="absolute top-20 right-[10%] h-64 w-64 rounded-full bg-primary/5 mix-blend-multiply filter blur-xl animate-pulse-gentle"></div>
+      <div class="absolute bottom-20 left-[10%] h-72 w-72 rounded-full bg-blue-200/20 dark:bg-blue-500/10 mix-blend-multiply filter blur-xl animate-pulse-gentle" style="animation-delay: 1s;"></div>
+    </div>
+
+    <!-- Auth Section -->
+    <div id="auth" class="py-20 px-4 md:px-8">
+      <div id="auth-container" class="max-w-md mx-auto glass-card p-8 transition-all duration-700 opacity-0 translate-y-10">
+        <div id="auth-loading" class="py-20 px-4 md:px-8 flex justify-center items-center min-h-[300px] hidden">
+          <i data-lucide="loader-2" class="h-8 w-8 animate-spin text-primary"></i>
+        </div>
+
+        <div id="auth-logged-in" class="hidden">
+          <i data-lucide="user" class="h-12 w-12 mx-auto mb-4 text-primary"></i>
+          <h2 class="text-xl font-semibold text-center mb-6">Sesión Iniciada</h2>
+          <p class="text-center text-muted-foreground mb-6">
+            Has iniciado sesión como <span id="user-email" class="font-medium"></span>
+          </p>
+          <p class="text-center text-sm text-muted-foreground">
+            Ahora puedes acceder a todas las funciones de la aplicación.
+          </p>
+        </div>
+
+        <div id="auth-form">
+          <div class="text-center mb-8">
+            <h2 class="text-2xl font-semibold" id="auth-title">
+              Iniciar Sesión
+            </h2>
+            <p class="text-muted-foreground mt-2" id="auth-subtitle">
+              Accede a tu cuenta para continuar
+            </p>
+          </div>
+          
+          <form id="auth-form-element" class="space-y-4">
+            <div class="space-y-2">
+              <label for="email" class="block text-sm font-medium">
+                Correo Electrónico
+              </label>
+              <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <i data-lucide="mail" class="h-5 w-5 text-gray-400"></i>
+                </div>
+                <input
+                  id="email"
+                  type="email"
+                  placeholder="tu@correo.com"
+                  class="pl-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                  required
+                />
+              </div>
+            </div>
+            
+            <div class="space-y-2">
+              <label for="password" class="block text-sm font-medium">
+                Contraseña
+              </label>
+              <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <i data-lucide="lock" class="h-5 w-5 text-gray-400"></i>
+                </div>
+                <input
+                  id="password"
+                  type="password"
+                  placeholder="Tu contraseña"
+                  class="pl-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                  required
+                  minlength="6"
+                />
+              </div>
+              <p id="password-hint" class="text-xs text-muted-foreground hidden">
+                La contraseña debe tener al menos 6 caracteres
+              </p>
+            </div>
+            
+            <button
+              type="submit"
+              id="auth-submit-button"
+              class="w-full bg-primary text-white font-medium py-2 px-4 rounded-lg hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-colors"
+            >
+              Iniciar Sesión
+            </button>
+          </form>
+          
+          <div class="mt-6 text-center">
+            <button
+              type="button"
+              id="auth-toggle-button"
+              class="text-sm text-primary hover:text-primary/80 transition-colors"
+            >
+              ¿No tienes cuenta? Regístrate
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stress Test Section -->
+    <div id="stress-test" class="py-20 px-4 md:px-8">
+      <div id="stress-test-container" class="max-w-xl mx-auto glass-card p-8 transition-all duration-700 opacity-0 translate-y-10">
+        <div id="stress-test-not-logged-in" class="text-center py-8">
+          <div class="text-center mb-6">
+            <h2 class="text-2xl font-semibold mb-2">Evaluación de Estrés Laboral</h2>
+            <p class="text-muted-foreground">
+              Basada en la NOM-035-STPS-2018 para identificar factores de riesgo psicosocial
+            </p>
+          </div>
+          
+          <i data-lucide="alert-circle" class="h-12 w-12 mx-auto mb-4 text-yellow-500"></i>
+          <h3 class="text-lg font-medium mb-2">Inicia sesión para comenzar</h3>
+          <p class="text-muted-foreground mb-6">
+            Para realizar la evaluación y guardar tus resultados, necesitas iniciar sesión.
+          </p>
+          <button
+            onclick="scrollToSection('auth')"
+            class="bg-primary text-white font-medium py-2 px-6 rounded-lg hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-colors"
+          >
+            Ir a iniciar sesión
+          </button>
+        </div>
+
+        <div id="stress-test-content" class="hidden">
+          <div class="text-center mb-8">
+            <h2 class="text-2xl font-semibold mb-2">Evaluación de Estrés Laboral</h2>
+            <p class="text-muted-foreground">
+              Basada en la NOM-035-STPS-2018 para identificar factores de riesgo psicosocial
+            </p>
+          </div>
+          
+          <div id="stress-test-questions" class="animate-fade-in">
+            <div class="mb-6">
+              <div class="flex justify-between text-sm mb-2">
+                <span id="question-progress">Pregunta 1 de 10</span>
+                <span id="progress-percentage">Progreso: 0%</span>
+              </div>
+              <div class="h-2 w-full bg-gray-200 rounded-full overflow-hidden">
+                <div
+                  id="progress-bar"
+                  class="h-full bg-primary transition-all duration-300"
+                  style="width: 0%"
+                ></div>
+              </div>
+            </div>
+            
+            <div class="mb-6">
+              <h3 id="current-question" class="text-lg font-medium mb-4"></h3>
+              
+              <div id="rating-options" class="grid grid-cols-1 gap-3">
+                <!-- Rating options will be inserted here -->
+              </div>
+            </div>
+            
+            <div class="flex justify-between">
+              <button
+                id="prev-button"
+                class="py-2 px-4 rounded-lg text-primary bg-transparent hover:bg-secondary/50 disabled:opacity-50 transition-colors"
+              >
+                Anterior
+              </button>
+              
+              <button
+                id="next-button"
+                class="py-2 px-4 rounded-lg text-primary bg-transparent hover:bg-secondary/50 disabled:opacity-50 transition-colors"
+              >
+                Siguiente
+              </button>
+            </div>
+          </div>
+          
+          <div id="stress-test-complete" class="text-center animate-fade-in hidden">
+            <i data-lucide="check-circle-2" class="h-12 w-12 mx-auto mb-4 text-green-500"></i>
+            <h3 class="text-lg font-medium mb-2">¡Has completado todas las preguntas!</h3>
+            <p class="text-muted-foreground mb-6">
+              Ahora puedes enviar tus respuestas para recibir tus resultados y recomendaciones.
+            </p>
+            
+            <button
+              id="submit-test-button"
+              class="bg-primary text-white font-medium py-2 px-6 rounded-lg hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-colors"
+            >
+              Ver Mis Resultados
+            </button>
+          </div>
+          
+          <div id="stress-test-results" class="hidden">
+            <h2 class="text-2xl font-semibold text-center mb-6">Resultados de tu Evaluación</h2>
+            
+            <div class="flex justify-center mb-6">
+              <div id="result-level" class="flex items-center space-x-2">
+                <!-- Result level will be inserted here -->
+              </div>
+            </div>
+            
+            <div class="mb-8">
+              <div class="h-4 w-full bg-gray-200 rounded-full overflow-hidden">
+                <div 
+                  id="score-bar"
+                  class="h-full transition-all duration-1000 ease-out"
+                ></div>
+              </div>
+              <div class="flex justify-between text-xs mt-1">
+                <span>0</span>
+                <span>40</span>
+              </div>
+            </div>
+            
+            <p id="result-description" class="text-center mb-6">
+              <!-- Result description will be inserted here -->
+            </p>
+            
+            <div class="grid md:grid-cols-2 gap-4 mb-8">
+              <div class="glass p-4 rounded-xl">
+                <h3 class="font-medium mb-2">Recomendaciones:</h3>
+                <ul class="text-sm space-y-2">
+                  <li>• Practica técnicas de respiración y mindfulness</li>
+                  <li>• Establece límites claros entre trabajo y vida personal</li>
+                  <li>• Toma descansos regulares durante la jornada laboral</li>
+                  <li>• Prioriza un buen descanso nocturno</li>
+                </ul>
+              </div>
+              
+              <div class="glass p-4 rounded-xl">
+                <h3 class="font-medium mb-2">Próximos pasos:</h3>
+                <ul class="text-sm space-y-2">
+                  <li>• Explora la sección de mindfulness</li>
+                  <li>• Registra tus patrones de sueño</li>
+                  <li>• Comparte experiencias en el foro comunitario</li>
+                  <li>• Vuelve a realizar la evaluación en 2-4 semanas</li>
+                </ul>
+              </div>
+            </div>
+            
+            <div class="flex justify-center">
+              <button
+                id="reset-test-button"
+                class="bg-primary text-white font-medium py-2 px-6 rounded-lg hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-colors"
+              >
+                Realizar Evaluación Nuevamente
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mindfulness Section -->
+    <div id="mindfulness" class="py-20 px-4 md:px-8">
+      <div id="mindfulness-container" class="max-w-4xl mx-auto transition-all duration-700 opacity-0 translate-y-10">
+        <div id="mindfulness-loading" class="py-20 px-4 md:px-8 flex justify-center items-center min-h-[400px]">
+          <i data-lucide="loader-2" class="h-8 w-8 animate-spin text-primary"></i>
+        </div>
+
+        <div id="mindfulness-content" class="hidden">
+          <div class="text-center mb-12">
+            <h2 class="text-3xl font-semibold mb-3">Mindfulness y Respiración</h2>
+            <p class="text-muted-foreground max-w-2xl mx-auto">
+              Técnicas de respiración para reducir el estrés, mejorar la concentración y promover la calma mental.
+            </p>
+          </div>
+          
+          <div class="grid md:grid-cols-5 gap-8">
+            <div class="md:col-span-2 space-y-6">
+              <div class="glass-card p-6">
+                <h3 class="text-xl font-medium mb-4">Patrones de Respiración</h3>
+                
+                <div id="breathing-patterns" class="space-y-3">
+                  <!-- Breathing patterns will be inserted here -->
+                </div>
+              </div>
+              
+              <div class="glass-card p-6">
+                <h3 class="text-xl font-medium mb-3">Detalles</h3>
+                <p id="pattern-description" class="text-muted-foreground text-sm mb-4"></p>
+                
+                <div class="grid grid-cols-2 gap-3 text-sm">
+                  <div class="bg-secondary/50 p-3 rounded-lg">
+                    <div class="font-medium mb-1">Inhalar</div>
+                    <div id="inhale-duration" class="text-2xl"></div>
+                  </div>
+                  <div class="bg-secondary/50 p-3 rounded-lg">
+                    <div class="font-medium mb-1">Mantener</div>
+                    <div id="hold-duration" class="text-2xl"></div>
+                  </div>
+                  <div class="bg-secondary/50 p-3 rounded-lg">
+                    <div class="font-medium mb-1">Exhalar</div>
+                    <div id="exhale-duration" class="text-2xl"></div>
+                  </div>
+                  <div class="bg-secondary/50 p-3 rounded-lg">
+                    <div class="font-medium mb-1">Pausa</div>
+                    <div id="pause-duration" class="text-2xl"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="md:col-span-3 glass-card p-6 flex flex-col items-center justify-center relative overflow-hidden">
+              <div class="absolute top-4 right-4 z-10">
+                <button
+                  id="toggle-mute"
+                  class="p-2 rounded-full hover:bg-secondary/70 transition-colors"
+                  aria-label="Activar sonido"
+                >
+                  <i data-lucide="volume-x" class="h-5 w-5" id="mute-icon"></i>
+                  <i data-lucide="volume-2" class="h-5 w-5 hidden" id="volume-icon"></i>
+                </button>
+              </div>
+              
+              <!-- Background gradient circles -->
+              <div 
+                id="breathing-circle-bg"
+                class="absolute w-60 h-60 rounded-full mix-blend-multiply filter blur-xl opacity-20 transition-all duration-1000"
+                style="top: 30%; left: 20%;"
+              ></div>
+              <div 
+                class="absolute w-72 h-72 rounded-full bg-blue-300 mix-blend-multiply filter blur-xl opacity-10 transition-all duration-1000"
+                style="bottom: 20%; right: 10%;"
+              ></div>
+              
+              <div class="text-center mb-8">
+                <div id="phase-instruction" class="text-2xl font-medium mb-2">
+                  Inhala lentamente...
+                </div>
+              </div>
+              
+              <div class="relative flex items-center justify-center mb-12">
+                <div
+                  id="breathing-circle"
+                  class="w-52 h-52 rounded-full transition-transform duration-1000 ease-in-out flex items-center justify-center bg-opacity-20 dark:bg-opacity-30"
+                >
+                  <div class="w-40 h-40 rounded-full bg-white/40 dark:bg-white/10 backdrop-blur-sm"></div>
+                </div>
+              </div>
+              
+              <div class="flex space-x-4">
+                <button
+                  id="toggle-breathing"
+                  class="flex items-center space-x-2 bg-primary text-white px-6 py-3 rounded-full hover:bg-primary/90 transition-colors"
+                >
+                  <i data-lucide="play" class="h-5 w-5" id="play-icon"></i>
+                  <i data-lucide="pause" class="h-5 w-5 hidden" id="pause-icon"></i>
+                  <span id="breathing-button-text">Comenzar</span>
+                </button>
+              </div>
+            </div>
+          </div>
+          
+          <div class="mt-12 glass-card p-6">
+            <h3 class="text-xl font-medium mb-4">Beneficios del Mindfulness</h3>
+            
+            <div class="grid md:grid-cols-3 gap-6">
+              <div class="bg-secondary/50 p-4 rounded-lg">
+                <h4 class="font-medium mb-2">Reduce el estrés</h4>
+                <p class="text-sm text-muted-foreground">
+                  Las técnicas de respiración activan el sistema nervioso parasimpático, reduciendo la respuesta de estrés.
+                </p>
+              </div>
+              
+              <div class="bg-secondary/50 p-4 rounded-lg">
+                <h4 class="font-medium mb-2">Mejora la concentración</h4>
+                <p class="text-sm text-muted-foreground">
+                  El mindfulness entrena la mente para mantenerse enfocada en el momento presente, mejorando la productividad.
+                </p>
+              </div>
+              
+              <div class="bg-secondary/50 p-4 rounded-lg">
+                <h4 class="font-medium mb-2">Promueve el bienestar</h4>
+                <p class="text-sm text-muted-foreground">
+                  La práctica regular ayuda a reducir la ansiedad, mejorar el sueño y aumentar la sensación de bienestar general.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sleep Tracker Section -->
+    <div id="sleep" class="py-20 px-4 md:px-8">
+      <div id="sleep-container" class="max-w-4xl mx-auto transition-all duration-700 opacity-0 translate-y-10">
+        <div id="sleep-not-logged-in" class="max-w-xl mx-auto glass-card p-8">
+          <div class="text-center mb-6">
+            <h2 class="text-2xl font-semibold mb-2">Seguimiento de Sueño</h2>
+            <p class="text-muted-foreground">
+              Registra tus patrones de sueño para mejorar tu descanso y reducir el estrés
+            </p>
+          </div>
+          
+          <div class="text-center py-8">
+            <i data-lucide="alert-circle" class="h-12 w-12 mx-auto mb-4 text-yellow-500"></i>
+            <h3 class="text-lg font-medium mb-2">Inicia sesión para comenzar</h3>
+            <p class="text-muted-foreground mb-6">
+              Para registrar tus datos de sueño y recibir recomendaciones personalizadas, necesitas iniciar sesión.
+            </p>
+            <button
+              onclick="scrollToSection('auth')"
+              class="bg-primary text-white font-medium py-2 px-6 rounded-lg hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-colors"
+            >
+              Ir a iniciar sesión
+            </button>
+          </div>
+        </div>
+
+        <div id="sleep-content" class="hidden">
+          <div class="text-center mb-12">
+            <h2 class="text-3xl font-semibold mb-3">Seguimiento de Sueño</h2>
+            <p class="text-muted-foreground max-w-2xl mx-auto">
+              Un sueño adecuado es esencial para manejar el estrés laboral. Registra tus hábitos de sueño para mejorar tu bienestar.
+            </p>
+          </div>
+          
+          <div class="grid md:grid-cols-2 gap-8">
+            <div class="glass-card p-8">
+              <form id="sleep-form">
+                <h3 class="text-xl font-medium mb-6">Registrar Sueño</h3>
+                
+                <div class="mb-6">
+                  <label class="block text-sm font-medium mb-2">
+                    Horas de sueño
+                  </label>
+                  <div class="flex items-center">
+                    <input
+                      type="range"
+                      id="hours-slept"
+                      min="0"
+                      max="12"
+                      step="0.5"
+                      value="7"
+                      class="w-full h-2 bg-secondary rounded-lg appearance-none cursor-pointer"
+                    />
+                    <span id="hours-value" class="ml-3 w-10 text-center font-medium">7</span>
+                  </div>
+                  <div class="flex justify-between text-xs mt-1">
+                    <span>0h</span>
+                    <span>12h</span>
+                  </div>
+                </div>
+                
+                <div class="mb-6">
+                  <label class="block text-sm font-medium mb-2">
+                    Calidad del sueño
+                  </label>
+                  <div id="quality-options" class="grid grid-cols-5 gap-2">
+                    <!-- Quality options will be inserted here -->
+                  </div>
+                </div>
+                
+                <div class="mb-6">
+                  <label for="sleep-notes" class="block text-sm font-medium mb-2">
+                    Notas (opcional)
+                  </label>
+                  <textarea
+                    id="sleep-notes"
+                    placeholder="¿Algo que afectó tu sueño? ¿Te despertaste durante la noche?"
+                    class="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary min-h-[100px]"
+                  ></textarea>
+                </div>
+                
+                <button
+                  type="submit"
+                  id="sleep-submit-button"
+                  class="w-full bg-primary text-white font-medium py-3 px-4 rounded-lg hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-colors disabled:opacity-70"
+                  disabled
+                >
+                  Guardar Registro
+                </button>
+              </form>
+            </div>
+            
+            <div class="space-y-6">
+              <div class="glass-card p-6">
+                <div class="flex items-start mb-4">
+                  <i data-lucide="moon" class="h-6 w-6 text-primary mr-3 mt-1"></i>
+                  <div>
+                    <h3 class="text-lg font-medium mb-1">Sobre el sueño y el estrés</h3>
+                    <p class="text-sm text-muted-foreground">
+                      La falta de sueño puede amplificar los efectos del estrés laboral. Un buen descanso es crucial para la regulación emocional y cognitiva.
+                    </p>
+                  </div>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                  <div class="bg-secondary/50 p-3 rounded-lg">
+                    <span class="block text-xs font-medium uppercase tracking-wider mb-1">Recomendado</span>
+                    <span class="text-2xl font-medium">7-9h</span>
+                    <span class="block text-xs text-muted-foreground mt-1">Para adultos</span>
+                  </div>
+                  
+                  <div class="bg-secondary/50 p-3 rounded-lg">
+                    <span class="block text-xs font-medium uppercase tracking-wider mb-1">Tu promedio</span>
+                    <span id="current-hours" class="text-2xl font-medium">7h</span>
+                    <span class="block text-xs text-muted-foreground mt-1">Último registro</span>
+                  </div>
+                </div>
+                
+                <hr class="border-t border-border my-4" />
+                
+                <h4 class="text-sm font-medium mb-3">Estado según horas de sueño:</h4>
+                
+                <div id="sleep-status" class="space-y-2 text-sm">
+                  <!-- Sleep status will be inserted here -->
+                </div>
+              </div>
+              
+              <div class="glass-card p-6">
+                <h3 class="text-lg font-medium mb-4">Recomendaciones para mejorar tu sueño</h3>
+                
+                <ul class="space-y-3 text-sm">
+                  <li class="flex items-start">
+                    <div class="h-5 w-5 rounded-full bg-secondary/80 flex items-center justify-center text-xs mr-2 mt-0.5">1</div>
+                    <div>
+                      <span class="font-medium">Mantén un horario regular</span>
+                      <p class="text-muted-foreground mt-0.5">Acuéstate y despierta a la misma hora todos los días.</p>
+                    </div>
+                  </li>
+                  
+                  <li class="flex items-start">
+                    <div class="h-5 w-5 rounded-full bg-secondary/80 flex items-center justify-center text-xs mr-2 mt-0.5">2</div>
+                    <div>
+                      <span class="font-medium">Crea un ambiente adecuado</span>
+                      <p class="text-muted-foreground mt-0.5">Habitación oscura, fresca y sin ruidos.</p>
+                    </div>
+                  </li>
+                  
+                  <li class="flex items-start">
+                    <div class="h-5 w-5 rounded-full bg-secondary/80 flex items-center justify-center text-xs mr-2 mt-0.5">3</div>
+                    <div>
+                      <span class="font-medium">Limita la exposición a pantallas</span>
+                      <p class="text-muted-foreground mt-0.5">Evita dispositivos electrónicos 1 hora antes de dormir.</p>
+                    </div>
+                  </li>
+                  
+                  <li class="flex items-start">
+                    <div class="h-5 w-5 rounded-full bg-secondary/80 flex items-center justify-center text-xs mr-2 mt-0.5">4</div>
+                    <div>
+                      <span class="font-medium">Practica relajación</span>
+                      <p class="text-muted-foreground mt-0.5">Usa técnicas de respiración o meditación antes de dormir.</p>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Community Forum (placeholder) -->
+    <div id="community" class="py-20 px-4 md:px-8">
+      <div id="community-container" class="max-w-4xl mx-auto glass-card p-8 transition-all duration-700 opacity-0 translate-y-10">
+        <div class="text-center mb-8">
+          <h2 class="text-3xl font-semibold mb-3">Comunidad NOM-035</h2>
+          <p class="text-muted-foreground max-w-2xl mx-auto">
+            Comparte tus experiencias y aprende de otros profesionales sobre cómo manejar el estrés en el entorno laboral.
+          </p>
+        </div>
+        
+        <div class="flex items-center justify-center py-12">
+          <div class="text-center">
+            <i data-lucide="users" class="h-16 w-16 mx-auto mb-6 text-primary/60"></i>
+            <h3 class="text-xl font-medium mb-3">Foro en desarrollo</h3>
+            <p class="text-muted-foreground mb-6 max-w-md mx-auto">
+              Estamos trabajando para crear un espacio de comunidad donde puedas compartir experiencias y recibir apoyo.
+              Pronto estará disponible.
+            </p>
+            <button
+              onclick="scrollToSection('home')"
+              class="bg-primary text-white px-6 py-2 rounded-lg hover:bg-primary/90 transition-colors"
+            >
+              Volver al inicio
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container"></div>
+  </div>
+
+  <script>
+    // Wait for Lucide to load
+    document.addEventListener('DOMContentLoaded', () => {
+      lucide.createIcons();
+      
+      // Initialize Firebase
+      const firebaseConfig = {
+        apiKey: "AIzaSyAFpvzYgT3B07KeN2Aqjp45BgwCfK8_aMI",
+  authDomain: "nom35rlh.firebaseapp.com",
+  projectId: "nom35rlh",
+  storageBucket: "nom35rlh.firebasestorage.app",
+  messagingSenderId: "740928428874",
+  appId: "1:740928428874:web:fd68b27cccbf73edfaffb3"
+      };
+      
+      firebase.initializeApp(firebaseConfig);
+      
+      // Get references to auth and firestore
+      const auth = firebase.auth();
+      const db = firebase.firestore();
+      
+      // Initialize the app
+      initializeApp();
+    });
+
+    function initializeApp() {
+      // Theme handling
+      setupThemeToggle();
+      
+      // Navigation
+      setupNavigation();
+      
+      // Sections
+      setupHeroSection();
+      setupAuthSection();
+      setupStressTest();
+      setupMindfulness();
+      setupSleepTracker();
+      setupCommunitySection();
+      
+      // Check auth state
+      firebase.auth().onAuthStateChanged(handleAuthStateChanged);
+    }
+
+    function setupThemeToggle() {
+      const isDarkMode = localStorage.getItem('darkMode') === 'true';
+      if (isDarkMode) {
+        document.documentElement.classList.add('dark');
+        toggleThemeIcons(true);
+      } else {
+        document.documentElement.classList.remove('dark');
+        toggleThemeIcons(false);
+      }
+
+      // Desktop theme toggle
+      document.getElementById('theme-toggle').addEventListener('click', toggleTheme);
+      
+      // Mobile theme toggle
+      document.getElementById('mobile-theme-toggle').addEventListener('click', toggleTheme);
+    }
+
+    function toggleTheme() {
+      const isDark = document.documentElement.classList.toggle('dark');
+      localStorage.setItem('darkMode', isDark);
+      toggleThemeIcons(isDark);
+    }
+
+    function toggleThemeIcons(isDark) {
+      // Desktop icons
+      const moonIcon = document.querySelectorAll('.theme-toggle-icon')[0];
+      const sunIcon = document.querySelectorAll('.theme-toggle-icon')[1];
+      
+      // Mobile icons
+      const mobileMoonIcon = document.querySelectorAll('.mobile-theme-toggle-icon')[0];
+      const mobileSunIcon = document.querySelectorAll('.mobile-theme-toggle-icon')[1];
+      
+      if (isDark) {
+        moonIcon.classList.add('hidden');
+        sunIcon.classList.remove('hidden');
+        mobileMoonIcon.classList.add('hidden');
+        mobileSunIcon.classList.remove('hidden');
+      } else {
+        moonIcon.classList.remove('hidden');
+        sunIcon.classList.add('hidden');
+        mobileMoonIcon.classList.remove('hidden');
+        mobileSunIcon.classList.add('hidden');
+      }
+    }
+
+    function setupNavigation() {
+      // Handle scroll events for navbar background
+      window.addEventListener('scroll', function() {
+        const navbar = document.getElementById('navbar');
+        if (window.scrollY > 10) {
+          navbar.classList.add('bg-white/80', 'dark:bg-gray-900/80', 'backdrop-blur-lg', 'shadow-sm');
+        } else {
+          navbar.classList.remove('bg-white/80', 'dark:bg-gray-900/80', 'backdrop-blur-lg', 'shadow-sm');
+        }
+      });
+      
+      // Mobile menu toggle
+      const mobileMenuButton = document.getElementById('mobile-menu-button');
+      const mobileMenu = document.getElementById('mobile-menu');
+      const menuIcon = document.getElementById('menu-icon');
+      const closeIcon = document.getElementById('close-icon');
+      
+      mobileMenuButton.addEventListener('click', () => {
+        const isOpen = mobileMenu.classList.toggle('hidden');
+        
+        if (isOpen) {
+          menuIcon.classList.remove('hidden');
+          closeIcon.classList.add('hidden');
+        } else {
+          menuIcon.classList.add('hidden');
+          closeIcon.classList.remove('hidden');
+        }
+      });
+    }
+
+    function closeMobileMenu() {
+      const mobileMenu = document.getElementById('mobile-menu');
+      const menuIcon = document.getElementById('menu-icon');
+      const closeIcon = document.getElementById('close-icon');
+      
+      mobileMenu.classList.add('hidden');
+      menuIcon.classList.remove('hidden');
+      closeIcon.classList.add('hidden');
+    }
+
+    function scrollToSection(id) {
+      const element = document.getElementById(id);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+
+    function setupHeroSection() {
+      // Animate hero content after a delay
+      setTimeout(() => {
+        const heroContent = document.getElementById('hero-content');
+        heroContent.classList.remove('opacity-0');
+      }, 100);
+    }
+
+    function setupAuthSection() {
+      // Show auth container with animation
+      setTimeout(() => {
+        const authContainer = document.getElementById('auth-container');
+        authContainer.classList.remove('opacity-0', 'translate-y-10');
+      }, 300);
+      
+      // Auth state variables
+      let isLogin = true;
+      
+      // Get elements
+      const authTitle = document.getElementById('auth-title');
+      const authSubtitle = document.getElementById('auth-subtitle');
+      const authForm = document.getElementById('auth-form-element');
+      const authToggleButton = document.getElementById('auth-toggle-button');
+      const passwordInput = document.getElementById('password');
+      const passwordHint = document.getElementById('password-hint');
+      const authSubmitButton = document.getElementById('auth-submit-button');
+      
+      // Toggle between login and register
+      authToggleButton.addEventListener('click', () => {
+        isLogin = !isLogin;
+        
+        if (isLogin) {
+          authTitle.textContent = 'Iniciar Sesión';
+          authSubtitle.textContent = 'Accede a tu cuenta para continuar';
+          passwordInput.placeholder = 'Tu contraseña';
+          authToggleButton.textContent = '¿No tienes cuenta? Regístrate';
+          authSubmitButton.textContent = 'Iniciar Sesión';
+          passwordHint.classList.add('hidden');
+        } else {
+          authTitle.textContent = 'Crear Cuenta';
+          authSubtitle.textContent = 'Regístrate para comenzar a mejorar tu bienestar';
+          passwordInput.placeholder = 'Crea una contraseña';
+          authToggleButton.textContent = '¿Ya tienes cuenta? Inicia sesión';
+          authSubmitButton.textContent = 'Crear Cuenta';
+          passwordHint.classList.remove('hidden');
+        }
+      });
+      
+      // Handle form submission
+      authForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        
+        if (!email || !password) {
+          showToast('Campos requeridos', 'Por favor completa todos los campos.', 'error');
+          return;
+        }
+        
+        try {
+          if (isLogin) {
+            await loginUser(email, password);
+          } else {
+            await registerUser(email, password);
+          }
+        } catch (error) {
+          showToast('Error', error.message, 'error');
+        }
+      });
+    }
+
+    async function loginUser(email, password) {
+      try {
+        await firebase.auth().signInWithEmailAndPassword(email, password);
+        showToast('¡Bienvenido!', 'Has iniciado sesión correctamente.', 'success');
+      } catch (error) {
+        console.error('Error logging in:', error);
+        throw new Error('Hubo un problema con el inicio de sesión. Verifica tus credenciales.');
+      }
+    }
+
+    async function registerUser(email, password) {
+      try {
+        await firebase.auth().createUserWithEmailAndPassword(email, password);
+        showToast('¡Registro exitoso!', 'Tu cuenta ha sido creada y has iniciado sesión.', 'success');
+      } catch (error) {
+        console.error('Error registering:', error);
+        throw new Error('Hubo un problema con el registro. El correo podría estar en uso o la contraseña es débil.');
+      }
+    }
+
+    async function handleLogout() {
+      try {
+        await firebase.auth().signOut();
+        showToast('Hasta pronto', 'Has cerrado sesión correctamente', 'success');
+      } catch (error) {
+        showToast('Error al cerrar sesión', error.message, 'error');
+      }
+    }
+
+    function handleAuthStateChanged(user) {
+      // Authentication section
+      updateAuthUI(user);
+      
+      // Update logout buttons visibility
+      const logoutButton = document.getElementById('logout-button');
+      const mobileLogoutButton = document.getElementById('mobile-logout-button');
+      
+      if (user) {
+        logoutButton.classList.remove('hidden');
+        mobileLogoutButton.classList.remove('hidden');
+      } else {
+        logoutButton.classList.add('hidden');
+        mobileLogoutButton.classList.add('hidden');
+      }
+      
+      // Update stress test section
+      updateStressTestUI(user);
+      
+      // Update sleep tracker section
+      updateSleepTrackerUI(user);
+    }
+
+    function updateAuthUI(user) {
+      const authLoading = document.getElementById('auth-loading');
+      const authForm = document.getElementById('auth-form');
+      const authLoggedIn = document.getElementById('auth-logged-in');
+      
+      if (user) {
+        authForm.classList.add('hidden');
+        authLoggedIn.classList.remove('hidden');
+        document.getElementById('user-email').textContent = user.email;
+      } else {
+        authForm.classList.remove('hidden');
+        authLoggedIn.classList.add('hidden');
+      }
+      
+      authLoading.classList.add('hidden');
+    }
+
+    // Stress Test Implementation
+    function setupStressTest() {
+      // Show container with animation
+      setTimeout(() => {
+        const container = document.getElementById('stress-test-container');
+        container.classList.remove('opacity-0', 'translate-y-10');
+      }, 300);
+      
+      // Questions data
+      const questions = [
+        {
+          id: 1,
+          text: "¿Con qué frecuencia me siento agotado/a mentalmente al final de mi jornada laboral?",
+        },
+        {
+          id: 2,
+          text: "¿Con qué frecuencia me resulta difícil concentrarme en mis tareas laborales?",
+        },
+        {
+          id: 3,
+          text: "¿Con qué frecuencia siento que mi carga de trabajo es excesiva?",
+        },
+        {
+          id: 4,
+          text: "¿Con qué frecuencia tengo dificultades para dormir debido a preocupaciones relacionadas con el trabajo?",
+        },
+        {
+          id: 5,
+          text: "¿Con qué frecuencia me siento irritable o de mal humor debido al estrés laboral?",
+        },
+        {
+          id: 6,
+          text: "¿Con qué frecuencia experimento dolores físicos (como dolor de cabeza, tensión muscular) debido al estrés laboral?",
+        },
+        {
+          id: 7,
+          text: "¿Con qué frecuencia siento que no tengo control sobre aspectos importantes de mi trabajo?",
+        },
+        {
+          id: 8,
+          text: "¿Con qué frecuencia me siento presionado por plazos difíciles de cumplir?",
+        },
+        {
+          id: 9,
+          text: "¿Con qué frecuencia siento que mi trabajo afecta negativamente a mi vida personal?",
+        },
+        {
+          id: 10,
+          text: "¿Con qué frecuencia siento que no recibo el reconocimiento adecuado por mi trabajo?",
+        },
+      ];
+      
+      // Rating options
+      const ratingOptions = [
+        { value: 0, label: "Nunca" },
+        { value: 1, label: "Rara vez" },
+        { value: 2, label: "Algunas veces" },
+        { value: 3, label: "Con frecuencia" },
+        { value: 4, label: "Siempre" },
+      ];
+      
+      // State variables
+      let currentStep = 0;
+      let answers = {};
+      
+      // Get elements
+      const prevButton = document.getElementById('prev-button');
+      const nextButton = document.getElementById('next-button');
+      const submitButton = document.getElementById('submit-test-button');
+      const resetButton = document.getElementById('reset-test-button');
+      const questionsDiv = document.getElementById('stress-test-questions');
+      const completeDiv = document.getElementById('stress-test-complete');
+      const resultsDiv = document.getElementById('stress-test-results');
+      
+      // Set up the test UI when a user is authenticated
+      function initializeStressTest() {
+        // Reset state
+        currentStep = 0;
+        answers = {};
+        
+        // Show questions, hide complete and results
+        questionsDiv.classList.remove('hidden');
+        completeDiv.classList.add('hidden');
+        resultsDiv.classList.add('hidden');
+        
+        // Display first question
+        displayQuestion();
+        updateProgress();
+        
+        // Event listeners
+        prevButton.addEventListener('click', goToPrevQuestion);
+        nextButton.addEventListener('click', goToNextQuestion);
+        submitButton.addEventListener('click', submitTest);
+        resetButton.addEventListener('click', resetTest);
+      }
+      
+      function displayQuestion() {
+        // Update question text
+        document.getElementById('current-question').textContent = questions[currentStep].text;
+        
+        // Generate rating options
+        const optionsContainer = document.getElementById('rating-options');
+        optionsContainer.innerHTML = '';
+        
+        ratingOptions.forEach(option => {
+          const button = document.createElement('button');
+          button.type = 'button';
+          button.className = `p-3 rounded-lg transition-all ${
+            answers[questions[currentStep].id] === option.value
+              ? "bg-primary text-white"
+              : "bg-secondary/50 hover:bg-secondary"
+          }`;
+          button.textContent = option.label;
+          button.addEventListener('click', () => {
+            // Save answer
+            answers[questions[currentStep].id] = option.value;
+            
+            // Update UI
+            displayQuestion();
+            
+            // Auto advance to next question if not last
+            if (currentStep < questions.length - 1) {
+              goToNextQuestion();
+            }
+          });
+          
+          optionsContainer.appendChild(button);
+        });
+        
+        // Update button states
+        prevButton.disabled = currentStep === 0;
+        nextButton.disabled = !answers[questions[currentStep].id];
+      }
+      
+      function updateProgress() {
+        const progress = (currentStep / questions.length) * 100;
+        document.getElementById('question-progress').textContent = `Pregunta ${currentStep + 1} de ${questions.length}`;
+        document.getElementById('progress-percentage').textContent = `Progreso: ${Math.round(progress)}%`;
+        document.getElementById('progress-bar').style.width = `${progress}%`;
+      }
+      
+      function goToPrevQuestion() {
+        if (currentStep > 0) {
+          currentStep--;
+          displayQuestion();
+          updateProgress();
+        }
+      }
+      
+      function goToNextQuestion() {
+        if (currentStep < questions.length - 1) {
+          currentStep++;
+          displayQuestion();
+          updateProgress();
+        } else {
+          // Show completion screen
+          questionsDiv.classList.add('hidden');
+          completeDiv.classList.remove('hidden');
+        }
+      }
+      
+      async function submitTest() {
+        const score = calculateScore();
+        
+        try {
+          // Save results to firestore
+          await saveStressTestResult(score);
+          
+          // Display results
+          displayResults(score);
+          
+          // Show toast
+          showToast('Evaluación completada', 'Tus resultados han sido guardados correctamente.', 'success');
+        } catch (error) {
+          console.error('Error saving stress test results:', error);
+          showToast('Error al guardar resultados', error.message, 'error');
+        }
+      }
+      
+      async function saveStressTestResult(score) {
+        const user = firebase.auth().currentUser;
+        if (!user) throw new Error('Usuario no autenticado');
+        
+        try {
+          await firebase.firestore().collection('stressTests').add({
+            userId: user.uid,
+            answers: answers,
+            score: score,
+            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+          });
+          
+          return { success: true };
+        } catch (error) {
+          console.error('Error in Firestore:', error);
+          throw new Error('Hubo un problema al guardar los resultados.');
+        }
+      }
+      
+      function calculateScore() {
+        return Object.values(answers).reduce((total, value) => total + value, 0);
+      }
+      
+      function displayResults(score) {
+        // Hide completion screen, show results
+        completeDiv.classList.add('hidden');
+        resultsDiv.classList.remove('hidden');
+        
+        // Get interpretation based on score
+        const interpretation = getResultInterpretation(score);
+        
+        // Update UI elements
+        const resultLevel = document.getElementById('result-level');
+        resultLevel.className = `flex items-center space-x-2 ${interpretation.color}`;
+        resultLevel.innerHTML = `
+          <i data-lucide="${interpretation.icon}" class="h-6 w-6"></i>
+          <span class="text-xl font-medium">
+            Nivel de estrés: ${interpretation.level}
+          </span>
+        `;
+        lucide.createIcons(); // Refresh icons
+        
+        // Update score bar
+        const scoreBar = document.getElementById('score-bar');
+        scoreBar.className = `h-full transition-all duration-1000 ease-out ${interpretation.barColor}`;
+        scoreBar.style.width = `${(score / 40) * 100}%`;
+        
+        // Update description
+        document.getElementById('result-description').textContent = interpretation.description;
+      }
+      
+      function getResultInterpretation(score) {
+        if (score <= 10) {
+          return {
+            level: "Bajo",
+            description: "Tu nivel de estrés laboral es bajo. Continúa con buenas prácticas para mantener tu bienestar.",
+            color: "text-green-500",
+            barColor: "bg-green-500",
+            icon: "check-circle-2"
+          };
+        } else if (score <= 20) {
+          return {
+            level: "Moderado",
+            description: "Tu nivel de estrés laboral es moderado. Considera implementar técnicas de manejo del estrés y revisa tu equilibrio trabajo-vida.",
+            color: "text-yellow-500",
+            barColor: "bg-yellow-500",
+            icon: "info"
+          };
+        } else {
+          return {
+            level: "Alto",
+            description: "Tu nivel de estrés laboral es alto. Te recomendamos tomar medidas inmediatas para reducir el estrés y considerar buscar apoyo profesional.",
+            color: "text-red-500",
+            barColor: "bg-red-500",
+            icon: "alert-circle"
+          };
+        }
+      }
+      
+      function resetTest() {
+        initializeStressTest();
+      }
+      
+      window.initializeStressTest = initializeStressTest;
+    }
+
+    function updateStressTestUI(user) {
+      const notLoggedIn = document.getElementById('stress-test-not-logged-in');
+      const content = document.getElementById('stress-test-content');
+      
+      if (user) {
+        notLoggedIn.classList.add('hidden');
+        content.classList.remove('hidden');
+        
+        // Initialize the stress test
+        window.initializeStressTest();
+      } else {
+        notLoggedIn.classList.remove('hidden');
+        content.classList.add('hidden');
+      }
+    }
+
+    // Mindfulness Implementation
+    function setupMindfulness() {
+      // Show container with animation
+      setTimeout(() => {
+        const container = document.getElementById('mindfulness-container');
+        container.classList.remove('opacity-0', 'translate-y-10');
+        
+        // Hide loading, show content
+        document.getElementById('mindfulness-loading').classList.add('hidden');
+        document.getElementById('mindfulness-content').classList.remove('hidden');
+      }, 500);
+      
+      // Breathing patterns data
+      const breathingPatterns = [
+        {
+          id: "box",
+          name: "Respiración cuadrada",
+          description: "Inhala por 4 segundos, mantén por 4, exhala por 4, y pausa por 4. Ayuda a calmar la ansiedad.",
+          inhaleDuration: 4,
+          holdDuration: 4,
+          exhaleDuration: 4,
+          pauseDuration: 4,
+          color: "bg-blue-500"
+        },
+        {
+          id: "relaxing",
+          name: "Respiración relajante",
+          description: "Inhala por 4 segundos, exhala lentamente por 6. Ideal para reducir el estrés rápidamente.",
+          inhaleDuration: 4,
+          holdDuration: 0,
+          exhaleDuration: 6,
+          pauseDuration: 0,
+          color: "bg-green-500"
+        },
+        {
+          id: "energizing",
+          name: "Respiración energizante",
+          description: "Inhala rápidamente por 2 segundos, mantén por 1, exhala por 4. Ayuda a aumentar la energía.",
+          inhaleDuration: 2,
+          holdDuration: 1,
+          exhaleDuration: 4,
+          pauseDuration: 0,
+          color: "bg-amber-500"
+        }
+      ];
+      
+      // State variables
+      let selectedPattern = breathingPatterns[0];
+      let isBreathing = false;
+      let breathingPhase = "inhale";
+      let phaseProgress = 0;
+      let isMuted = true;
+      let audio = null;
+      let animationFrameId = null;
+      let lastUpdateTime = null;
+      
+      // Get elements
+      const patternsContainer = document.getElementById('breathing-patterns');
+      const toggleBreathingButton = document.getElementById('toggle-breathing');
+      const toggleMuteButton = document.getElementById('toggle-mute');
+      const breathingCircle = document.getElementById('breathing-circle');
+      const breathingCircleBg = document.getElementById('breathing-circle-bg');
+      const phaseInstruction = document.getElementById('phase-instruction');
+      const inhaleDurationEl = document.getElementById('inhale-duration');
+      const holdDurationEl = document.getElementById('hold-duration');
+      const exhaleDurationEl = document.getElementById('exhale-duration');
+      const pauseDurationEl = document.getElementById('pause-duration');
+      const patternDescriptionEl = document.getElementById('pattern-description');
+      const playIcon = document.getElementById('play-icon');
+      const pauseIcon = document.getElementById('pause-icon');
+      const breathingButtonText = document.getElementById('breathing-button-text');
+      const muteIcon = document.getElementById('mute-icon');
+      const volumeIcon = document.getElementById('volume-icon');
+      
+      // Initialize audio
+      audio = new Audio("https://cdn.pixabay.com/download/audio/2022/03/15/audio_c8c8a73467.mp3?filename=calm-river-ambience-loop-125071.mp3");
+      audio.loop = true;
+      audio.volume = 0.3;
+      
+      // Create pattern buttons
+      breathingPatterns.forEach(pattern => {
+        const button = document.createElement('button');
+        button.className = `w-full p-3 rounded-lg text-left transition-all ${
+          selectedPattern.id === pattern.id ? "bg-secondary" : "hover:bg-secondary/50"
+        }`;
+        button.innerHTML = `
+          <div class="flex items-center">
+            <div class="h-3 w-3 rounded-full mr-2 ${pattern.color}"></div>
+            <span class="font-medium">${pattern.name}</span>
+          </div>
+        `;
+        
+        button.addEventListener('click', () => {
+          selectedPattern = pattern;
+          breathingPhase = "inhale";
+          phaseProgress = 0;
+          updateSelectedPattern();
+        });
+        
+        patternsContainer.appendChild(button);
+      });
+      
+      // Update pattern details
+      function updateSelectedPattern() {
+        // Update pattern buttons
+        Array.from(patternsContainer.children).forEach((button, idx) => {
+          if (selectedPattern.id === breathingPatterns[idx].id) {
+            button.classList.add('bg-secondary');
+            button.classList.remove('hover:bg-secondary/50');
+          } else {
+            button.classList.remove('bg-secondary');
+            button.classList.add('hover:bg-secondary/50');
+          }
+        });
+        
+        // Update details
+        patternDescriptionEl.textContent = selectedPattern.description;
+        inhaleDurationEl.textContent = selectedPattern.inhaleDuration + 's';
+        holdDurationEl.textContent = selectedPattern.holdDuration + 's';
+        exhaleDurationEl.textContent = selectedPattern.exhaleDuration + 's';
+        pauseDurationEl.textContent = selectedPattern.pauseDuration + 's';
+        
+        // Update circle color
+        breathingCircle.className = `w-52 h-52 rounded-full transition-transform duration-1000 ease-in-out flex items-center justify-center 
+          ${selectedPattern.color} bg-opacity-20 dark:bg-opacity-30`;
+        breathingCircleBg.className = `absolute w-60 h-60 rounded-full mix-blend-multiply filter blur-xl opacity-20 ${selectedPattern.color} transition-all duration-1000`;
+      }
+      
+      // Start with first pattern
+      updateSelectedPattern();
+      
+      // Toggle breathing animation
+      toggleBreathingButton.addEventListener('click', () => {
+        isBreathing = !isBreathing;
+        
+        if (isBreathing) {
+          startBreathing();
+          playIcon.classList.add('hidden');
+          pauseIcon.classList.remove('hidden');
+          breathingButtonText.textContent = 'Pausar';
+          
+          // Play audio if not muted
+          if (!isMuted) {
+            audio.play().catch(() => {
+              // Audio play was prevented
+              isMuted = true;
+              updateMuteButton();
+            });
+          }
+        } else {
+          stopBreathing();
+          playIcon.classList.remove('hidden');
+          pauseIcon.classList.add('hidden');
+          breathingButtonText.textContent = 'Comenzar';
+          
+          // Pause audio
+          if (!isMuted) {
+            audio.pause();
+          }
+        }
+      });
+      
+      // Toggle mute
+      toggleMuteButton.addEventListener('click', () => {
+        isMuted = !isMuted;
+        updateMuteButton();
+        
+        if (isMuted) {
+          audio.pause();
+        } else if (isBreathing) {
+          audio.play().catch(() => {
+            // Playback was prevented
+            isMuted = true;
+            updateMuteButton();
+          });
+        }
+      });
+      
+      function updateMuteButton() {
+        if (isMuted) {
+          muteIcon.classList.remove('hidden');
+          volumeIcon.classList.add('hidden');
+          toggleMuteButton.setAttribute('aria-label', 'Activar sonido');
+        } else {
+          muteIcon.classList.add('hidden');
+          volumeIcon.classList.remove('hidden');
+          toggleMuteButton.setAttribute('aria-label', 'Silenciar');
+        }
+      }
+      
+      function startBreathing() {
+        breathingPhase = "inhale";
+        phaseProgress = 0;
+        lastUpdateTime = performance.now();
+        
+        function animate(timestamp) {
+          if (!lastUpdateTime) {
+            lastUpdateTime = timestamp;
+          }
+          
+          const deltaTime = (timestamp - lastUpdateTime) / 1000; // in seconds
+          lastUpdateTime = timestamp;
+          
+          // Update the progress based on the current phase
+          let phaseDuration;
+          switch (breathingPhase) {
+            case "inhale":
+              phaseDuration = selectedPattern.inhaleDuration;
+              break;
+            case "hold":
+              phaseDuration = selectedPattern.holdDuration;
+              break;
+            case "exhale":
+              phaseDuration = selectedPattern.exhaleDuration;
+              break;
+            case "pause":
+              phaseDuration = selectedPattern.pauseDuration;
+              break;
+            default:
+              phaseDuration = 1;
+          }
+          
+          phaseProgress += (deltaTime / phaseDuration);
+          
+          if (phaseProgress >= 1) {
+            // Move to the next phase
+            switch (breathingPhase) {
+              case "inhale":
+                breathingPhase = selectedPattern.holdDuration > 0 ? "hold" : "exhale";
+                break;
+              case "hold":
+                breathingPhase = "exhale";
+                break;
+              case "exhale":
+                breathingPhase = selectedPattern.pauseDuration > 0 ? "pause" : "inhale";
+                break;
+              case "pause":
+                breathingPhase = "inhale";
+                break;
+            }
+            phaseProgress = 0;
+          }
+          
+          updateBreathingAnimation();
+          
+          if (isBreathing) {
+            animationFrameId = requestAnimationFrame(animate);
+          }
+        }
+        
+        animationFrameId = requestAnimationFrame(animate);
+      }
+      
+      function stopBreathing() {
+        if (animationFrameId) {
+          cancelAnimationFrame(animationFrameId);
+          animationFrameId = null;
+        }
+        
+        // Reset circle to default state
+        breathingCircle.style.transform = 'scale(1)';
+        phaseInstruction.textContent = 'Inhala lentamente...';
+      }
+      
+      function updateBreathingAnimation() {
+        // Update instruction text
+        phaseInstruction.textContent = getPhaseInstruction();
+        
+        // Update circle size
+        breathingCircle.style.transform = getCircleScale();
+      }
+      
+      function getPhaseInstruction() {
+        switch (breathingPhase) {
+          case "inhale":
+            return "Inhala lentamente...";
+          case "hold":
+            return "Mantén tu respiración...";
+          case "exhale":
+            return "Exhala suavemente...";
+          case "pause":
+            return "Pausa...";
+          default:
+            return "";
+        }
+      }
+      
+      function getCircleScale() {
+        switch (breathingPhase) {
+          case "inhale":
+            return `scale(${1 + (phaseProgress * 0.4)})`;
+          case "hold":
+            return `scale(1.4)`;
+          case "exhale":
+            return `scale(${1.4 - (phaseProgress * 0.4)})`;
+          case "pause":
+            return `scale(1)`;
+          default:
+            return `scale(1)`;
+        }
+      }
+    }
+
+    // Sleep Tracker Implementation
+    function setupSleepTracker() {
+      // Show container with animation
+      setTimeout(() => {
+        const container = document.getElementById('sleep-container');
+        container.classList.remove('opacity-0', 'translate-y-10');
+      }, 300);
+      
+      // Quality options
+      const qualityOptions = [
+        { value: 1, label: "Muy mala", color: "bg-red-500" },
+        { value: 2, label: "Mala", color: "bg-orange-500" },
+        { value: 3, label: "Regular", color: "bg-yellow-500" },
+        { value: 4, label: "Buena", color: "bg-blue-500" },
+        { value: 5, label: "Excelente", color: "bg-green-500" },
+      ];
+      
+      // State variables
+      let hoursSlept = 7;
+      let selectedQuality = null;
+      
+      // Get elements
+      const hoursSlider = document.getElementById('hours-slept');
+      const hoursValue = document.getElementById('hours-value');
+      const qualityOptionsContainer = document.getElementById('quality-options');
+      const sleepForm = document.getElementById('sleep-form');
+      const submitButton = document.getElementById('sleep-submit-button');
+      const currentHoursEl = document.getElementById('current-hours');
+      const sleepStatusEl = document.getElementById('sleep-status');
+      
+      // Set up sleep tracker when user is logged in
+      function initializeSleepTracker() {
+        // Update hours display
+        hoursSlider.addEventListener('input', (e) => {
+          hoursSlept = parseFloat(e.target.value);
+          hoursValue.textContent = hoursSlept;
+          currentHoursEl.textContent = `${hoursSlept}h`;
+          updateSleepStatus();
+        });
+        
+        // Create quality options
+        qualityOptionsContainer.innerHTML = '';
+        qualityOptions.forEach(option => {
+          const button = document.createElement('button');
+          button.type = 'button';
+          button.className = `flex flex-col items-center justify-center p-3 rounded-lg transition-all ${
+            selectedQuality === option.value
+              ? `${option.color} text-white`
+              : "bg-secondary/50 hover:bg-secondary"
+          }`;
+          button.innerHTML = `
+            <span class="text-lg mb-1">${'★'.repeat(option.value)}</span>
+            <span class="text-xs">${option.label}</span>
+          `;
+          
+          button.addEventListener('click', () => {
+            selectedQuality = option.value;
+            
+            // Update all buttons
+            Array.from(qualityOptionsContainer.children).forEach((btn, idx) => {
+              if (qualityOptions[idx].value === selectedQuality) {
+                btn.className = `flex flex-col items-center justify-center p-3 rounded-lg transition-all ${qualityOptions[idx].color} text-white`;
+              } else {
+                btn.className = 'flex flex-col items-center justify-center p-3 rounded-lg transition-all bg-secondary/50 hover:bg-secondary';
+              }
+            });
+            
+            // Enable submit button
+            submitButton.disabled = false;
+          });
+          
+          qualityOptionsContainer.appendChild(button);
+        });
+        
+        // Form submission
+        sleepForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          
+          if (selectedQuality === null) {
+            showToast('Datos incompletos', 'Por favor selecciona la calidad de tu sueño.', 'error');
+            return;
+          }
+          
+          const notes = document.getElementById('sleep-notes').value;
+          
+          try {
+            // Show loading state
+            submitButton.disabled = true;
+            submitButton.innerHTML = '<i data-lucide="loader-2" class="h-5 w-5 mx-auto animate-spin"></i>';
+            lucide.createIcons();
+            
+            // Save to firestore
+            await saveSleepData(hoursSlept, selectedQuality, notes);
+            
+            // Show success
+            submitButton.innerHTML = '¡Guardado con éxito!';
+            showToast('Datos guardados', 'Tu registro de sueño ha sido guardado correctamente.', 'success');
+            
+            // Reset form after delay
+            setTimeout(() => {
+              selectedQuality = null;
+              document.getElementById('sleep-notes').value = '';
+              
+              // Reset quality buttons
+              Array.from(qualityOptionsContainer.children).forEach(btn => {
+                btn.className = 'flex flex-col items-center justify-center p-3 rounded-lg transition-all bg-secondary/50 hover:bg-secondary';
+              });
+              
+              submitButton.innerHTML = 'Guardar Registro';
+              submitButton.disabled = true;
+            }, 3000);
+          } catch (error) {
+            console.error('Error saving sleep data:', error);
+            showToast('Error', error.message, 'error');
+            submitButton.innerHTML = 'Guardar Registro';
+            submitButton.disabled = false;
+          }
+        });
+        
+        // Initialize sleep status
+        updateSleepStatus();
+      }
+      
+      async function saveSleepData(hours, quality, notes) {
+        const user = firebase.auth().currentUser;
+        if (!user) throw new Error('Usuario no autenticado');
+        
+        try {
+          await firebase.firestore().collection('sleepData').add({
+            userId: user.uid,
+            hours: hours,
+            quality: quality,
+            notes: notes,
+            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+          });
+          
+          return { success: true };
+        } catch (error) {
+          console.error('Error in Firestore:', error);
+          throw new Error('Hubo un problema al guardar los datos de sueño.');
+        }
+      }
+      
+      function updateSleepStatus() {
+        sleepStatusEl.innerHTML = '';
+        
+        if (hoursSlept < 5) {
+          sleepStatusEl.innerHTML = `
+            <div class="flex items-center p-2 bg-red-500/20 text-red-700 dark:text-red-300 rounded">
+              <i data-lucide="alert-circle" class="h-4 w-4 mr-2"></i>
+              <span>Sueño insuficiente: Riesgo alto de estrés</span>
+            </div>
+          `;
+        } else if (hoursSlept >= 5 && hoursSlept < 7) {
+          sleepStatusEl.innerHTML = `
+            <div class="flex items-center p-2 bg-yellow-500/20 text-yellow-700 dark:text-yellow-300 rounded">
+              <i data-lucide="alert-circle" class="h-4 w-4 mr-2"></i>
+              <span>Sueño bajo: Riesgo moderado de estrés</span>
+            </div>
+          `;
+        } else if (hoursSlept >= 7 && hoursSlept <= 9) {
+          sleepStatusEl.innerHTML = `
+            <div class="flex items-center p-2 bg-green-500/20 text-green-700 dark:text-green-300 rounded">
+              <i data-lucide="star" class="h-4 w-4 mr-2"></i>
+              <span>Sueño óptimo: Nivel de estrés controlado</span>
+            </div>
+          `;
+        } else {
+          sleepStatusEl.innerHTML = `
+            <div class="flex items-center p-2 bg-blue-500/20 text-blue-700 dark:text-blue-300 rounded">
+              <i data-lucide="moon" class="h-4 w-4 mr-2"></i>
+              <span>Sueño prolongado: Posible fatiga o condición médica</span>
+            </div>
+          `;
+        }
+        
+        lucide.createIcons();
+      }
+      
+      window.initializeSleepTracker = initializeSleepTracker;
+    }
+
+    function updateSleepTrackerUI(user) {
+      const notLoggedIn = document.getElementById('sleep-not-logged-in');
+      const content = document.getElementById('sleep-content');
+      
+      if (user) {
+        notLoggedIn.classList.add('hidden');
+        content.classList.remove('hidden');
+        
+        // Initialize the sleep tracker
+        window.initializeSleepTracker();
+      } else {
+        notLoggedIn.classList.remove('hidden');
+        content.classList.add('hidden');
+      }
+    }
+
+    function setupCommunitySection() {
+      // Show container with animation
+      setTimeout(() => {
+        const container = document.getElementById('community-container');
+        container.classList.remove('opacity-0', 'translate-y-10');
+      }, 300);
+    }
+
+    // Toast notification system
+    function showToast(title, message, type = 'success') {
+      const toastContainer = document.getElementById('toast-container');
+      
+      const toast = document.createElement('div');
+      toast.className = `toast toast-${type}`;
+      toast.innerHTML = `
+        <div class="mr-3">
+          <i data-lucide="${type === 'success' ? 'check-circle' : 'alert-circle'}" class="h-5 w-5 ${type === 'success' ? 'text-green-500' : 'text-red-500'}"></i>
+        </div>
+        <div class="flex-1">
+          <p class="font-medium">${title}</p>
+          <p class="text-xs text-muted-foreground">${message}</p>
+        </div>
+      `;
+      
+      toastContainer.appendChild(toast);
+      lucide.createIcons();
+      
+      // Remove toast after animation completes
+      setTimeout(() => {
+        toast.remove();
+      }, 5000);
+    }
+  </script>
+  <!-- IMPORTANT: DO NOT REMOVE THIS SCRIPT TAG OR THIS VERY COMMENT! -->
+  <script src="https://cdn.gpteng.co/gptengineer.js" type="module"></script>
+</body>
+</html>
